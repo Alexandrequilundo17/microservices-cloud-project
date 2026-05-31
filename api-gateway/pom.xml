@@ -64,6 +64,12 @@
             <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
             <version>${springdoc.version}</version>
         </dependency>
+
+        <dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <scope>runtime</scope>
+</dependency>
         
         <!-- Micrometer for Observability (Prometheus metrics) -->
         <dependency>

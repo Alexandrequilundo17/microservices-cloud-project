@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://week7-database.cjc0su22elzg.eu-central-1.rds.amazonaws.com:5432/week7db
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: ${DB_PASSWORD:Admin1234!}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  h2:
+    console:
+      enabled: false
