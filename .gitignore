@@ -1,0 +1,7 @@
+# Ficheiros sensíveis — nunca vão para o git
+terraform.tfvars
+*.tfstate
+*.tfstate.backup
+tfplan
+.terraform/
+.terraform.lock.hcl
