@@ -1,56 +1,16 @@
-# Maven
+# Terraform — nunca vai para o git
+*.tfstate
+*.tfstate.backup
+terraform.tfvars
+tfplan
+.terraform/
+.terraform.lock.hcl
+
+# Java
 target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
+*.class
 
 # IDE
 .idea/
-*.iws
-*.iml
-*.ipr
 .vscode/
-.classpath
-.project
-.settings/
-*.swp
-*.swo
-*~
-
-# Spring Boot
-*.log
-*.jar
-*.war
-*.ear
-*.class
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Docker
-*.log
-
-# Terraform
-.terraform/
-*.tfstate
-*.tfstate.*
-.terraform.lock.hcl
-
-# Environment variables
-.env
-.env.local
-
-# Logs
-logs/
-*.log
-
-# Service PIDs
-.service-pids
-
+*.iml
