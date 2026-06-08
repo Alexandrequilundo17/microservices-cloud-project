@@ -14,3 +14,5 @@ target/
 .idea/
 .vscode/
 *.iml
+ansible/vars.yml
+ansible/playbooks/vars.yml
