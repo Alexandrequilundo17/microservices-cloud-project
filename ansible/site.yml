@@ -1,0 +1,132 @@
+---
+- name: Configurar host cloud para os microservicos
+  hosts: cloud
+  become: true
+  gather_facts: true
+  vars:
+    deploy_stack: false
+    aws_access_key_id: ""
+    aws_secret_access_key: ""
+    aws_region: "eu-central-1"
+
+  pre_tasks:
+    - name: Garantir memoria suficiente para o stack
+      ansible.builtin.assert:
+        that:
+          - ansible_memtotal_mb | int >= 3500
+        fail_msg: "A instancia tem memoria insuficiente para correr os microservicos com folga."
+        success_msg: "A instancia tem memoria suficiente para o deployment."
+
+  tasks:
+    - name: Atualizar cache apt
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Instalar Docker e plugin Compose
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - docker-compose-v2
+        state: present
+
+    - name: Garantir Docker ativo
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Adicionar ubuntu ao grupo docker
+      ansible.builtin.user:
+        name: ubuntu
+        groups: docker
+        append: true
+
+    - name: Criar diretoria do deployment
+      ansible.builtin.file:
+        path: /opt/microservices
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: "0755"
+
+    - name: Criar diretoria do codigo da aplicacao
+      ansible.builtin.file:
+        path: /opt/microservices/app
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: "0755"
+
+    - name: Copiar docker-compose principal
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../docker-compose.yml"
+        dest: /opt/microservices/app/docker-compose.yml
+        owner: ubuntu
+        group: ubuntu
+        mode: "0644"
+
+    - name: Copiar user-service
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../user-service/"
+        dest: /opt/microservices/app/user-service/
+        owner: ubuntu
+        group: ubuntu
+        mode: preserve
+
+    - name: Copiar product-service
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../product-service/"
+        dest: /opt/microservices/app/product-service/
+        owner: ubuntu
+        group: ubuntu
+        mode: preserve
+
+    - name: Copiar order-service
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../order-service/"
+        dest: /opt/microservices/app/order-service/
+        owner: ubuntu
+        group: ubuntu
+        mode: preserve
+
+    - name: Copiar api-gateway
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../api-gateway/"
+        dest: /opt/microservices/app/api-gateway/
+        owner: ubuntu
+        group: ubuntu
+        mode: preserve
+
+    - name: Fazer build das imagens
+      ansible.builtin.command:
+        cmd: docker compose build
+        chdir: /opt/microservices/app
+      environment:
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access_key }}"
+        AWS_REGION: "{{ aws_region }}"
+      when: deploy_stack | bool
+
+    - name: Arrancar stack
+      ansible.builtin.command:
+        cmd: docker compose up -d --remove-orphans
+        chdir: /opt/microservices/app
+      environment:
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access_key }}"
+        AWS_REGION: "{{ aws_region }}"
+      when: deploy_stack | bool
+
+    - name: Obter estado dos containers
+      ansible.builtin.command:
+        cmd: docker compose ps
+        chdir: /opt/microservices/app
+      register: compose_ps
+      changed_when: false
+      when: deploy_stack | bool
+
+    - name: Mostrar estado dos containers
+      ansible.builtin.debug:
+        var: compose_ps.stdout_lines
+      when: deploy_stack | bool

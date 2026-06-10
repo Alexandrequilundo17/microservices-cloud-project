@@ -2,8 +2,11 @@ package pt.ulusofona.orderservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import pt.ulusofona.orderservice.sqs.OrderEventSqsProperties;
+import pt.ulusofona.orderservice.sqs.OrderProductEventsSqsProperties;
 
 /**
  * Main application class for the Order Service microservice.
@@ -37,7 +40,8 @@ import org.springframework.kafka.annotation.EnableKafka;
  */
 @SpringBootApplication
 @EnableFeignClients
-@EnableKafka
+@EnableScheduling
+@EnableConfigurationProperties({OrderProductEventsSqsProperties.class, OrderEventSqsProperties.class})
 public class OrderServiceApplication {
 
     /**

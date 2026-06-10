@@ -2,7 +2,10 @@ package pt.ulusofona.productservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import pt.ulusofona.productservice.sqs.OrderEventSqsProperties;
+import pt.ulusofona.productservice.sqs.ProductSqsProperties;
 
 /**
  * Main application class for the Product Service microservice.
@@ -31,7 +34,8 @@ import org.springframework.kafka.annotation.EnableKafka;
  * @see org.springframework.kafka.annotation.EnableKafka
  */
 @SpringBootApplication
-@EnableKafka
+@EnableScheduling
+@EnableConfigurationProperties({ProductSqsProperties.class, OrderEventSqsProperties.class})
 public class ProductServiceApplication {
 
     /**

@@ -16,3 +16,10 @@ target/
 *.iml
 ansible/vars.yml
 ansible/playbooks/vars.yml
+
+# Ficheiros sensíveis
+ansible/vars.yml
+infrastructure/terraform/terraform.tfvars
+infrastructure/terraform/tfplan
+*.bak
+
