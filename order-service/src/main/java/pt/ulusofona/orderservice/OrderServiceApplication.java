@@ -4,8 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import pt.ulusofona.orderservice.sqs.OrderEventSqsProperties;
 import pt.ulusofona.orderservice.sqs.OrderProductEventsSqsProperties;
 
 /**
@@ -40,9 +40,8 @@ import pt.ulusofona.orderservice.sqs.OrderProductEventsSqsProperties;
  */
 @SpringBootApplication
 @EnableFeignClients
-@EnableKafka
 @EnableScheduling
-@EnableConfigurationProperties(OrderProductEventsSqsProperties.class)
+@EnableConfigurationProperties({OrderProductEventsSqsProperties.class, OrderEventSqsProperties.class})
 public class OrderServiceApplication {
 
     /**

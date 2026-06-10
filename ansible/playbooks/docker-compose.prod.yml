@@ -1,30 +1,5 @@
 services:
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
-    container_name: zookeeper
-    restart: unless-stopped
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - microservices-network
-
-  kafka:
-    image: confluentinc/cp-kafka:7.5.0
-    container_name: kafka
-    restart: unless-stopped
-    depends_on:
-      - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-    networks:
-      - microservices-network
-
   user-service:
     image: alexq113/user-service:1.0
     container_name: user-service
@@ -46,9 +21,12 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SERVER_PORT: 8082
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    depends_on:
-      - kafka
+      CLOUD_SQS_PRODUCT_EVENTS_ENABLED: "true"
+      CLOUD_SQS_PRODUCT_EVENTS_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/cn-course-product-events
+      CLOUD_SQS_PRODUCT_EVENTS_REGION: eu-central-1
+      CLOUD_SQS_ORDER_CREATED_CONSUMER_ENABLED: "true"
+      CLOUD_SQS_ORDER_CREATED_CONSUMER_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/order-created
+      CLOUD_SQS_ORDER_CREATED_CONSUMER_REGION: eu-central-1
     networks:
       - microservices-network
 
@@ -61,11 +39,15 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SERVER_PORT: 8083
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      USER_SERVICE_URL: http://user-service:8081
-      PRODUCT_SERVICE_URL: http://product-service:8082
+      CLOUD_SQS_ORDER_CREATED_PUBLISHER_ENABLED: "true"
+      CLOUD_SQS_ORDER_CREATED_PUBLISHER_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/order-created
+      CLOUD_SQS_ORDER_CREATED_PUBLISHER_REGION: eu-central-1
+      CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_ENABLED: "true"
+      CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/cn-course-product-events
+      CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_REGION: eu-central-1
+      SERVICES_USER_URL: http://user-service:8081
+      SERVICES_PRODUCT_URL: http://product-service:8082
     depends_on:
-      - kafka
       - user-service
       - product-service
     networks:

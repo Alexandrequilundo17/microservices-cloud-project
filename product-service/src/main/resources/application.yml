@@ -5,7 +5,7 @@ spring:
     url: jdbc:h2:mem:productsdb
     driver-class-name: org.h2.Driver
     username: sa
-    password: 
+    password:
   h2:
     console:
       enabled: true
@@ -18,16 +18,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-  
-  kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      group-id: product-service-group
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*"
-        spring.json.type.mapping: orderCreated:pt.ulusofona.productservice.event.OrderCreatedEvent
 
 server:
   port: 8082
@@ -65,13 +55,18 @@ logging:
   level:
     pt.ulusofona.productservice: DEBUG
     org.springframework.web: INFO
-    org.springframework.kafka: INFO
 
-# Optional AWS SQS (Week 10 – students create queue + set URL; code ships in the template)
+# AWS SQS configuration
 cloud:
   sqs:
     product-events:
       enabled: false
       queue-url: ""
       region: ""
-
+    order-created-consumer:
+      enabled: false
+      queue-url: "https://sqs.eu-central-1.amazonaws.com/263050932702/order-created"
+      region: "eu-central-1"
+      poll-interval-ms: 5000
+      max-number-of-messages: 10
+      wait-time-seconds: 20

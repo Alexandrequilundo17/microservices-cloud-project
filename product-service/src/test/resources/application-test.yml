@@ -11,11 +11,10 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: false
-  kafka:
-    consumer:
-      auto-startup: false
 
 cloud:
   sqs:
     product-events:
+      enabled: false
+    order-created-consumer:
       enabled: false

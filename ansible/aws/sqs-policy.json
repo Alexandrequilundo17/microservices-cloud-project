@@ -1,0 +1,22 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sqs:ChangeMessageVisibility",
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:ListQueues",
+        "sqs:ReceiveMessage",
+        "sqs:SendMessage"
+      ],
+      "Resource": [
+        "arn:aws:sqs:eu-central-1:263050932702:order-created",
+        "arn:aws:sqs:eu-central-1:263050932702:cn-course-product-events",
+        "arn:aws:sqs:eu-central-1:263050932702:cn-course-product-events-dlq"
+      ]
+    }
+  ]
+}

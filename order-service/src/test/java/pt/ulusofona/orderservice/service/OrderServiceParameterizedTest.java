@@ -10,6 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
+import pt.ulusofona.orderservice.sqs.OrderEventSqsPublisher;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -33,7 +35,8 @@ class OrderServiceParameterizedTest {
     private pt.ulusofona.orderservice.client.ProductServiceClient productServiceClient;
 
     @Mock
-    private org.springframework.kafka.core.KafkaTemplate<String, Object> kafkaTemplate;
+    @SuppressWarnings("unchecked")
+    private ObjectProvider<OrderEventSqsPublisher> orderEventSqsPublisher;
 
     @InjectMocks
     private OrderService orderService;

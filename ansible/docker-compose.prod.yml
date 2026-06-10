@@ -21,10 +21,12 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SERVER_PORT: 8082
-      CLOUD_SQS_ENABLED: "true"
+      CLOUD_SQS_PRODUCT_EVENTS_ENABLED: "true"
       CLOUD_SQS_PRODUCT_EVENTS_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/cn-course-product-events
-      CLOUD_SQS_ORDER_CREATED_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/order-created
-      AWS_REGION: eu-central-1
+      CLOUD_SQS_PRODUCT_EVENTS_REGION: eu-central-1
+      CLOUD_SQS_ORDER_CREATED_CONSUMER_ENABLED: "true"
+      CLOUD_SQS_ORDER_CREATED_CONSUMER_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/order-created
+      CLOUD_SQS_ORDER_CREATED_CONSUMER_REGION: eu-central-1
     networks:
       - microservices-network
 
@@ -37,12 +39,14 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SERVER_PORT: 8083
-      CLOUD_SQS_ENABLED: "true"
-      CLOUD_SQS_ORDER_CREATED_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/order-created
-      CLOUD_SQS_PRODUCT_EVENTS_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/cn-course-product-events
-      USER_SERVICE_URL: http://user-service:8081
-      PRODUCT_SERVICE_URL: http://product-service:8082
-      AWS_REGION: eu-central-1
+      CLOUD_SQS_ORDER_CREATED_PUBLISHER_ENABLED: "true"
+      CLOUD_SQS_ORDER_CREATED_PUBLISHER_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/order-created
+      CLOUD_SQS_ORDER_CREATED_PUBLISHER_REGION: eu-central-1
+      CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_ENABLED: "true"
+      CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/cn-course-product-events
+      CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_REGION: eu-central-1
+      SERVICES_USER_URL: http://user-service:8081
+      SERVICES_PRODUCT_URL: http://product-service:8082
     depends_on:
       - user-service
       - product-service

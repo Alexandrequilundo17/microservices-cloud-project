@@ -78,13 +78,7 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         
-        <!-- Kafka -->
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-        </dependency>
-
-        <!-- AWS SQS (optional; enabled via cloud.sqs.product-events-consumer.*) -->
+        <!-- AWS SQS (optional; enabled via cloud.sqs.*) -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>sqs</artifactId>
@@ -132,11 +126,6 @@
             <scope>test</scope>
         </dependency>
         
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka-test</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     
     <build>
