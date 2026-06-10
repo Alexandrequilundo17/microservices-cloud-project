@@ -1,0 +1,73 @@
+services:
+
+  user-service:
+    image: alexq113/user-service:1.0
+    container_name: user-service
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8081
+    networks:
+      - microservices-network
+
+  product-service:
+    image: alexq113/product-service:1.0
+    container_name: product-service
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8082
+      CLOUD_SQS_ENABLED: "true"
+      CLOUD_SQS_PRODUCT_EVENTS_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/cn-course-product-events
+      CLOUD_SQS_ORDER_CREATED_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/order-created
+      AWS_REGION: eu-central-1
+    networks:
+      - microservices-network
+
+  order-service:
+    image: alexq113/order-service:1.0
+    container_name: order-service
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8083
+      CLOUD_SQS_ENABLED: "true"
+      CLOUD_SQS_ORDER_CREATED_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/order-created
+      CLOUD_SQS_PRODUCT_EVENTS_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/cn-course-product-events
+      USER_SERVICE_URL: http://user-service:8081
+      PRODUCT_SERVICE_URL: http://product-service:8082
+      AWS_REGION: eu-central-1
+    depends_on:
+      - user-service
+      - product-service
+    networks:
+      - microservices-network
+
+  api-gateway:
+    image: alexq113/api-gateway:1.0
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8080
+      USER_SERVICE_URL: http://user-service:8081
+      PRODUCT_SERVICE_URL: http://product-service:8082
+      ORDER_SERVICE_URL: http://order-service:8083
+    depends_on:
+      - user-service
+      - product-service
+      - order-service
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
