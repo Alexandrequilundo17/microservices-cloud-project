@@ -98,6 +98,18 @@
         group: ubuntu
         mode: preserve
 
+    - name: Escrever ficheiro .env com credenciais AWS
+      ansible.builtin.copy:
+        content: |
+          AWS_ACCESS_KEY_ID={{ aws_access_key_id }}
+          AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }}
+          AWS_REGION={{ aws_region }}
+        dest: /opt/microservices/app/.env
+        owner: ubuntu
+        group: ubuntu
+        mode: "0600"
+      when: aws_access_key_id != ""
+
     - name: Fazer build das imagens
       ansible.builtin.command:
         cmd: docker compose build

@@ -6,15 +6,26 @@ on:
     types:
       - completed
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Copiar docker-compose.prod.yml para EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: ansible/docker-compose.prod.yml
+          target: /opt/microservices/app/
+          strip_components: 1
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
@@ -23,7 +34,23 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ubuntu/app
-            docker compose pull
-            docker compose up -d
-            docker ps
+            set -e
+            cd /opt/microservices/app
+
+            # Credenciais AWS no .env (root, sem permissions boundary)
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" > .env
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
+            echo "AWS_REGION=eu-central-1" >> .env
+            chmod 600 .env
+
+            # Parar containers anteriores
+            docker compose -f docker-compose.prod.yml down --remove-orphans || true
+
+            # Puxar imagens actualizadas do DockerHub
+            docker compose -f docker-compose.prod.yml pull
+
+            # Arrancar stack com novas imagens
+            docker compose -f docker-compose.prod.yml up -d
+
+            # Verificar estado final
+            docker compose -f docker-compose.prod.yml ps

@@ -1,7 +1,28 @@
 services:
 
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: week7db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Admin1234!
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d week7db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
   user-service:
-    image: alexq113/user-service:1.0
+    image: alexq113/user-service:latest
     container_name: user-service
     restart: unless-stopped
     ports:
@@ -9,11 +30,13 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SERVER_PORT: 8081
+    depends_on:
+      - postgres
     networks:
       - microservices-network
 
   product-service:
-    image: alexq113/product-service:1.0
+    image: alexq113/product-service:latest
     container_name: product-service
     restart: unless-stopped
     ports:
@@ -27,11 +50,15 @@ services:
       CLOUD_SQS_ORDER_CREATED_CONSUMER_ENABLED: "true"
       CLOUD_SQS_ORDER_CREATED_CONSUMER_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/order-created
       CLOUD_SQS_ORDER_CREATED_CONSUMER_REGION: eu-central-1
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+    depends_on:
+      - postgres
     networks:
       - microservices-network
 
   order-service:
-    image: alexq113/order-service:1.0
+    image: alexq113/order-service:latest
     container_name: order-service
     restart: unless-stopped
     ports:
@@ -45,16 +72,19 @@ services:
       CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_ENABLED: "true"
       CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_QUEUE_URL: https://sqs.eu-central-1.amazonaws.com/263050932702/cn-course-product-events
       CLOUD_SQS_PRODUCT_EVENTS_CONSUMER_REGION: eu-central-1
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
       SERVICES_USER_URL: http://user-service:8081
       SERVICES_PRODUCT_URL: http://product-service:8082
     depends_on:
+      - postgres
       - user-service
       - product-service
     networks:
       - microservices-network
 
   api-gateway:
-    image: alexq113/api-gateway:1.0
+    image: alexq113/api-gateway:latest
     container_name: api-gateway
     restart: unless-stopped
     ports:
@@ -75,3 +105,6 @@ services:
 networks:
   microservices-network:
     driver: bridge
+
+volumes:
+  postgres-data:

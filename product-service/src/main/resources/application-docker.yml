@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://week7-database.cjc0su22elzg.eu-central-1.rds.amazonaws.com:5432/week7db
+    url: jdbc:postgresql://postgres:5432/week7db
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: ${DB_PASSWORD:Admin1234!}
